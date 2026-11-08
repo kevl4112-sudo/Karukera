@@ -21,6 +21,16 @@ Open the existing private play URL and choose **PLAY — ISLAND CLASH**. Click t
 
 Start with **Tab → E → K → J**: acquire the rival, close the gap, launch, then follow up in the air. Use **F** when hit to escape. The ultimate begins half-charged in training; build it through combat, then press **5**. Light input can queue once near the end of recovery. Use **2** for Manman Dlo healing. Guard faces forward, and a well-timed guard can parry. Two escape charges regenerate individually.
 
+## Anime arena look (reference-clip pass)
+
+The presentation now follows the look of the supplied gameplay clips — bright cel-shaded arena brawler — while staying original and Caribbean. See [Docs/ANIME_LOOK.md](Docs/ANIME_LOOK.md).
+
+- **Rendering:** `dist/systems/anime-post.js` adds depth-based ink outlines, soft bloom on VFX, a vivid colour grade, vignette and impact flash. Falls back to plain rendering automatically; add `?nopost` to the URL to force it off.
+- **World:** painted blue sky dome, cel-shaded cumulus clouds, lush grass with dirt paths, flamboyant and mango trees, brighter stone, vivid lagoon sea.
+- **Fighters:** heavier ink outlines, a Madras-cloth cape, rim-lit flame auras during pursuit, casting, dashes and the ultimate.
+- **VFX:** Kalinago petroglyph-inspired casting circles, comic impact stars with ink streaks, thicker pursuit streaks, ink-smear strokes on the ultimate.
+- **HUD:** points scoreboard (real damage dealt + finish bonus), big italic clock, portrait medallion with long health/energy bars, circular ability buttons, red lock-on ring and overhead rival nameplate, comic "HITS" counter that follows the rival, Creole onomatopoeia pops (BIM! KOUT! KABOUM!), K.O. stamp, Madras ultimate cut-in, speed lines. Comic lettering uses the bundled Bangers font (SIL OFL, `dist/vendor/fonts`).
+
 ## Current milestone
 
 - Shaped, jointed anime fighters with original faces, locs, Madras/linen clothing, half-capes and varied combat poses.
@@ -33,7 +43,7 @@ See [video milestone details, file inventory and remaining work](Docs/VIDEO_MILE
 
 ## Verification
 
-`node tests/gameplay.cjs` passes **43 gameplay simulations** using real Three.js geometry/transforms/math with mocked DOM/WebGL. All application JavaScript files pass `node --check`. These checks do not establish rendered appearance or hardware compatibility. CPU pose projections help inspect geometry but omit textures and WebGL shading. Managed browser control is unavailable, so browser rendering, physical controllers, touch input, audio playback and actual frame rate remain unverified.
+`node tests/gameplay.cjs` passes **49 gameplay simulations** using real Three.js geometry/transforms/math with mocked DOM/WebGL. All application JavaScript files pass `node --check`. These checks do not establish rendered appearance or hardware compatibility. CPU pose projections help inspect geometry but omit textures and WebGL shading. Managed browser control is unavailable, so browser rendering, physical controllers, touch input, audio playback and actual frame rate remain unverified.
 
 The game's character assets and animation are procedural. It is not yet at the supplied commercial clip's character/animation fidelity. There is one AI rival, no online team multiplayer, campaign, full character editor, authored production animations or packaged UE build. The AI may still get blocked on complex rooftop routes. Next priorities are actual browser/device capture and tuning, authored original characters/animations, and a compiled UE integration.
 

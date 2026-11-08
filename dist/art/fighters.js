@@ -3,7 +3,7 @@
 'use strict';
 const T=global.THREE,A=global.KarukeraArt=global.KarukeraArt||{};
 const TAU=Math.PI*2,lerp=T.MathUtils.lerp,clamp=T.MathUtils.clamp;
-const lineMat=new T.MeshBasicMaterial({color:0x142a34,side:T.BackSide});
+const lineMat=new T.MeshBasicMaterial({color:0x121626,side:T.BackSide});
 function textile(){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');g.fillStyle='#a74440';g.fillRect(0,0,128,128);for(let i=0;i<8;i++){g.fillStyle=i%2?'#e8bb67':'#1d626d';g.fillRect(i*16,0,i%2?7:4,128);g.globalAlpha=.7;g.fillStyle=i%2?'#fff1b1':'#244c5d';g.fillRect(0,i*16,128,i%2?5:8);g.globalAlpha=1;}const tex=new T.CanvasTexture(c);tex.wrapS=tex.wrapT=T.RepeatWrapping;tex.colorSpace=T.SRGBColorSpace;return tex;}
 let madras;
 function patch(points){const positions=[],indices=[];for(const p of points)positions.push(...p);for(let i=1;i<points.length-1;i++)indices.push(0,i,i+1);const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;}
@@ -13,7 +13,7 @@ A.makeFighter=function(scene,enemy,color,skin,gradient){
  const toon=c=>new T.MeshToonMaterial({color:c,gradientMap:gradient});
  const cloth=toon(color),skinMat=toon(skin),dark=toon(enemy?0x2f273b:0x1d3646),gold=toon(enemy?0xe6a962:0xe5bf77),hair=toon(enemy?0x302330:0x1c202b),white=toon(0xf2e8cc),linen=toon(enemy?0xa5bbb6:0xe6dfc6),fabric=new T.MeshToonMaterial({map:madras,gradientMap:gradient,side:T.DoubleSide});
  const root=new T.Group(),rig=new T.Group(),spine=new T.Group();root.add(rig);rig.add(spine);spine.position.y=1.39;scene.add(root);root.name=enemy?'Mako · keeper of the stone tide':'Élian · windward island guardian';
- function part(geo,material,parent,x=0,y=0,z=0,outline=true){const m=new T.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=true;parent.add(m);if(outline){const l=new T.Mesh(geo,lineMat);l.scale.setScalar(1.018);m.add(l);}return m;}
+ function part(geo,material,parent,x=0,y=0,z=0,outline=true){const m=new T.Mesh(geo,material);m.position.set(x,y,z);m.castShadow=true;parent.add(m);if(outline){const l=new T.Mesh(geo,lineMat);l.scale.setScalar(1.04);m.add(l);}return m;}
  function ball(r,material,parent,x,y,z,sx=1,sy=1,sz=1,outline=true){const m=part(new T.SphereGeometry(r,14,10),material,parent,x,y,z,outline);m.scale.set(sx,sy,sz);return m;}
  function cube(w,h,d,material,parent,x,y,z){return part(new T.BoxGeometry(w,h,d),material,parent,x,y,z,false);}
  function taper(rt,rb,h,material,parent,x,y,z,outline=true){return part(new T.CylinderGeometry(rt,rb,h,12),material,parent,x,y,z,outline);}
@@ -70,11 +70,11 @@ A.makeFighter=function(scene,enemy,color,skin,gradient){
  // A light half-cape catches the wind; a small grid deforms instead of rigidly spinning a box.
  const capePivot=new T.Group();capePivot.position.set(-.07,.23,.11);spine.add(capePivot);
  const capeGeometry=new T.PlaneGeometry(.78,1.02,4,6),capeBase=new Float32Array(capeGeometry.attributes.position.array);
- const capeMaterial=linen.clone();capeMaterial.side=T.DoubleSide;
+ const capeMaterial=fabric.clone();capeMaterial.side=T.DoubleSide;capeMaterial.color.setHex(enemy?0xc9a0b8:0xffffff);
  const cape=part(capeGeometry,capeMaterial,capePivot,-.10,-.34,.11,false);
  cape.rotation.z=-.12;
  const capeTrimGeometry=new T.PlaneGeometry(.055,1.02,1,6),capeTrimBase=new Float32Array(capeTrimGeometry.attributes.position.array);
- const capeTrim=part(capeTrimGeometry,fabric,cape,-.3625,0,.004,false);
+ const capeTrim=part(capeTrimGeometry,gold,cape,-.3625,0,.004,false);
  const arms=[],elbows=[],hands=[],legs=[],knees=[],feet=[];
  for(const s of [-1,1]){
   const shoulder=new T.Group();shoulder.position.set(s*.355,.25,0);spine.add(shoulder);
