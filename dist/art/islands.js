@@ -13,6 +13,32 @@ function drawnTexture(kind){
  const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;texture.wrapS=texture.wrapT=T.RepeatWrapping;cache[kind]=texture;return texture;
 }
 function leaf(){if(cache.leaf)return cache.leaf;const v=[],indices=[];for(let i=0;i<=12;i++){const t=i/12,w=Math.sin(Math.PI*t)*.49*(i%3===1?.79:1);for(const s of [-1,1])v.push(s*w,t*3.4,-Math.sin(t*Math.PI)*.40+t*t*.25);if(i<12){const n=i*2;indices.push(n,n+1,n+2,n+1,n+3,n+2);}}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(v,3));geo.setIndex(indices);geo.computeVertexNormals();cache.leaf=geo;return geo;}
+// Painted-anime surfaces: brushed grass, dirt and panelled concrete (tiling, world-scaled UVs).
+function paintTexture(kind){
+ const key='paint-'+kind;if(cache[key])return cache[key];const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
+ const blob=(x,y,r,col)=>{g.fillStyle=col;g.beginPath();g.ellipse(x,y,r,r*(.45+rand()*.4),rand()*3,0,Math.PI*2);g.fill();};
+ const wrap=(fn)=>{for(const dx of [-512,0,512])for(const dy of [-512,0,512]){g.save();g.translate(dx,dy);fn();g.restore();}};
+ if(g&&g.ellipse){
+  if(kind==='grass'){g.fillStyle='#62ad44';g.fillRect(0,0,512,512);const pts=[];for(let i=0;i<70;i++)pts.push([rand()*512,rand()*512,20+rand()*60,rand()<.5?'rgba(120,190,80,.35)':'rgba(55,130,50,.30)']);wrap(()=>pts.forEach(p=>blob(...p)));
+   g.lineCap='round';for(let i=0;i<900;i++){const x=rand()*512,y=rand()*512,l=4+rand()*9;g.strokeStyle=rand()<.5?'rgba(150,215,100,.55)':'rgba(40,110,45,.45)';g.lineWidth=1.5;g.beginPath();g.moveTo(x,y);g.lineTo(x+(rand()-.5)*4,y-l);g.stroke();}}
+  if(kind==='dirt'){g.fillStyle='#cfa874';g.fillRect(0,0,512,512);const pts=[];for(let i=0;i<60;i++)pts.push([rand()*512,rand()*512,10+rand()*45,rand()<.5?'rgba(230,200,150,.35)':'rgba(150,110,70,.25)']);wrap(()=>pts.forEach(p=>blob(...p)));
+   g.strokeStyle='rgba(110,75,45,.45)';g.lineWidth=1.6;for(let i=0;i<26;i++){let x=rand()*512,y=rand()*512;g.beginPath();g.moveTo(x,y);for(let j=0;j<4;j++){x+=(rand()-.5)*30;y+=(rand()-.5)*30;g.lineTo(x,y);}g.stroke();}
+   for(let i=0;i<260;i++){g.fillStyle=rand()<.5?'rgba(120,85,55,.5)':'rgba(240,215,170,.5)';g.fillRect(rand()*512,rand()*512,2+rand()*3,2+rand()*2);}}
+  if(kind==='concrete'){g.fillStyle='#d3d6c6';g.fillRect(0,0,512,512);for(let i=0;i<50;i++)blob(rand()*512,rand()*512,20+rand()*70,rand()<.5?'rgba(255,255,245,.25)':'rgba(150,160,140,.18)');
+   g.strokeStyle='#8e9686';g.lineWidth=3;for(const x of [0,256,512]){g.beginPath();g.moveTo(x,0);g.lineTo(x,512);g.stroke();}g.beginPath();g.moveTo(0,300);g.lineTo(512,300);g.stroke();
+   for(let i=0;i<10;i++){const x=rand()*512,y=rand()*200;const gr=g.createLinearGradient(0,y,0,y+120+rand()*120);gr.addColorStop(0,'rgba(110,120,100,.35)');gr.addColorStop(1,'rgba(110,120,100,0)');g.fillStyle=gr;g.fillRect(x,y,6+rand()*14,240);}
+   g.strokeStyle='rgba(60,66,58,.6)';g.lineWidth=1.5;for(let i=0;i<8;i++){let x=rand()*512,y=rand()*512;g.beginPath();g.moveTo(x,y);for(let j=0;j<5;j++){x+=(rand()-.5)*26;y+=8+rand()*18;g.lineTo(x,y);}g.stroke();}
+   g.fillStyle='rgba(90,140,60,.55)';for(let i=0;i<30;i++)blob(rand()*512,500+rand()*12,8+rand()*14,'rgba(90,150,60,.6)');}
+ }
+ const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=8;cache[key]=t;return t;
+}
+function worldUV(geo,size){const p=geo.attributes.position,n=geo.attributes.normal,uv=geo.attributes.uv;if(!p||!n||!uv)return;for(let i=0;i<p.count;i++){const ax=Math.abs(n.getX(i)),ay=Math.abs(n.getY(i));let u,v;if(ay>.5){u=p.getX(i);v=p.getZ(i);}else if(ax>.5){u=p.getZ(i);v=p.getY(i);}else{u=p.getX(i);v=p.getY(i);}uv.setXY(i,u/size,v/size);}uv.needsUpdate=true;}
+A.paintTexture=paintTexture;
+function tuftTexture(){if(cache.tuft)return cache.tuft;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+ if(g&&g.quadraticCurveTo&&g.createLinearGradient){for(let i=0;i<11;i++){const x=20+i*8.5+(rand()-.5)*6,h=60+rand()*55,lean=(rand()-.5)*40;g.beginPath();g.moveTo(x-5,128);g.quadraticCurveTo(x+lean*.3,128-h*.6,x+lean,128-h);g.quadraticCurveTo(x+lean*.3+3,128-h*.5,x+5,128);g.closePath();const gr=g.createLinearGradient(0,128-h,0,128);gr.addColorStop(0,'#a6dd6a');gr.addColorStop(1,'#3d8f3a');g.fillStyle=gr;g.fill();g.lineWidth=2.2;g.strokeStyle='#1f4a26';g.stroke();}}
+ const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;cache.tuft=t;return t;}
+function tuftGeometry(){const w=.34,h=.42,pos=[],uv=[],idx=[];for(let k=0;k<2;k++){const a=k*Math.PI/2,cx=Math.cos(a)*w,cz=Math.sin(a)*w,b=pos.length/3;pos.push(-cx,0,-cz,cx,0,cz,cx,h,cz,-cx,h,-cz);uv.push(0,0,1,0,1,1,0,1);idx.push(b,b+1,b+2,b,b+2,b+3);}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();const n=g.attributes.normal;for(let i=0;i<n.count;i++)n.setXYZ(i,0,1,0);return g;}
+function blobShape(r,seed){const s=new T.Shape(),n=22;for(let i=0;i<n;i++){const a=i/n*Math.PI*2,k=r*(.72+.28*Math.sin(a*3+seed)+.12*Math.sin(a*7+seed*2)+(rand()-.5)*.12);const x=Math.cos(a)*k,y=Math.sin(a)*k*.75;i?s.lineTo(x,y):s.moveTo(x,y);}return s;}
 const palmMaterials=new Map();
 A.palm=function(scene,x,z,scale,gradient){
  const material=c=>{if(!palmMaterials.has(c))palmMaterials.set(c,new T.MeshToonMaterial({color:c,gradientMap:gradient,side:T.DoubleSide}));return palmMaterials.get(c);};
@@ -43,7 +69,9 @@ A.decorateWorld=function(scene,solids,gradient){
  function floorRing(inner,outer,color,y=.135){const m=obj(new T.RingGeometry(inner,outer,96),color,0,y,-32);m.rotation.x=-Math.PI/2;return m;}
  // Give the earlier blockout a coherent volcanic/coastal palette before merging it.
  const houses=[0xe8a04c,0xd96855,0x79bda1,0xd5a95e,0x58a5b1,0xf0bd68,0xa88ab9,0xde8969];
- scene.traverse(o=>{if(!o.isMesh||!o.material?.color)return;const c=o.material.color.getHex();if(houses.includes(c)){o.material.map=paint;o.material.needsUpdate=true;}if(c===0x509897){o.material.color.setHex(0x627c77);o.material.map=stone;o.material.needsUpdate=true;}if(c===0xc69b6a)o.material.color.setHex(0x5ca63f);if(c===0xd8b681)o.material.color.setHex(0xd9b779);});
+ const grassTex=paintTexture('grass'),dirtTex=paintTexture('dirt'),concreteTex=paintTexture('concrete'),retex=(o,color,map,size)=>{o.material.color.setHex(color);o.material.map=map;o.material.needsUpdate=true;worldUV(o.geometry,size);};
+ scene.traverse(o=>{if(!o.isMesh||!o.material?.color||!o.geometry?.attributes?.uv)return;const c=o.material.color.getHex();if(houses.includes(c)){o.material.map=paint;o.material.needsUpdate=true;}
+  if(c===0x509897)retex(o,0xffffff,concreteTex,5);if(c===0xca8566)retex(o,0xf3e6c8,concreteTex,5);if(c===0x5aa83e||c===0xc69b6a)retex(o,0xffffff,grassTex,7);if(c===0xd9b77c)retex(o,0xffffff,dirtTex,6);if(c===0xd8b681)retex(o,0xf0e0c0,dirtTex,5);});
  // Hand-drawn stone court. These are visual inlays on the existing collision floor.
  const disk=obj(new T.CircleGeometry(11.65,96),0x93a49b,0,.132,-32,scene,'stone');disk.rotation.x=-Math.PI/2;
  floorRing(10.95,11.4,0xd2b88a,.134);floorRing(10.55,10.64,0x294e59,.136);floorRing(7.9,8.0,0xc4ab7f,.137);floorRing(2.95,3.04,0xabb397,.138);
@@ -83,12 +111,17 @@ A.decorateWorld=function(scene,solids,gradient){
  box(0,7.3,-40,29,.45,2.5,0x7c8270,scene,'stone');solid(0,7.3,-40,29,.45,2.5);
  for(const z of [-41.25,-38.75]){box(0,8.15,z,28,.12,.12,0xd2bf94);solid(0,8.15,z,28,.12,.12);for(let x=-13;x<=13;x+=2.6)box(x,7.8,z,.10,1.1,.10,0x38555a);}
  for(const side of [-1,1]){box(side*13.3,6.05,-32,3,.3,30,0xa4ad91);solid(side*13.3,6.05,-32,3,.3,30);for(let i=0;i<4;i++){const x=side*(8.5+i*.65),z=-17-i*2.1,y=.65+i*.75;box(x,y/2,z,2.3,y,1.8,0x879786,scene,'stone');solid(x,y/2,z,2.3,y,1.8,true);}}
+ // Organic dirt patches with a darker painted rim, as on worn training grounds.
+ const dirtMat=new T.MeshToonMaterial({color:0xffffff,map:dirtTex,gradientMap:gradient}),rimMat=new T.MeshToonMaterial({color:0x7a5a38,gradientMap:gradient});
+ for(const [x,z,r] of [[-9,32,3.4],[8,20,2.6],[-8,6,3],[9,-6,3.2],[-6,-1,2.2],[-24,18,4],[24,26,3.6],[28,-10,3],[-30,-20,3.4],[-9.5,-21,2.2],[10.5,-22,2.4],[-10,-44,2.6],[9,-43.5,2.2],[0,52,4.2],[-36,40,3]]){
+  const sh=blobShape(r,x*.7+z),geo=new T.ShapeGeometry(sh,2);geo.rotateX(-Math.PI/2);const uv=geo.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)/5,uv.getY(i)/5);
+  const m=new T.Mesh(geo,dirtMat);const top=z<-17?.142:.03;m.position.set(x,top,z);m.receiveShadow=true;scene.add(m);const rim=new T.Mesh(geo,rimMat);rim.scale.set(1.06,1,1.08);rim.position.set(x,top-.007,z);rim.receiveShadow=true;scene.add(rim);}
  // Training-ground shade trees in the arena corners, flamboyants through the village.
  for(const [x,z,k,sc] of [[-11.6,-45.6,'mango',.95],[11.4,-45.4,'flamboyant',1],[-30,30,'flamboyant',1.2],[24.5,-3,'flamboyant',1.05],[-31,6,'mango',1.2],[-34,-14,'flamboyant',1.05],[7.5,47,'flamboyant',.9],[-7.5,47,'mango',.85],[-26,44,'mango',1.1],[-22,-6,'mango',1.05]])A.tree(scene,solids,x,z,k,gradient,sc);
  // Lush grounding in the village; one instanced draw each for grass and ferns.
- const grassGeo=new T.BufferGeometry();grassGeo.setAttribute('position',new T.Float32BufferAttribute([-.10,0,0,0,.43,0,.1,0,0,0,0,-.10,0,.33,0,0,0,.1],3));grassGeo.computeVertexNormals();
- const grass=new T.InstancedMesh(grassGeo,new T.MeshToonMaterial({color:0x4f9e3a,gradientMap:gradient,side:T.DoubleSide}),900),dummyGrass=new T.Object3D();
- for(let i=0;i<900;i++){let x=(rand()-.5)*95,z=(rand()-.5)*125;if(Math.abs(x)<5&&z>-17)x+=7;if(Math.hypot(x,z+32)<11.8)x+=(x<0?-1:1)*13;dummyGrass.position.set(x,.14,z);dummyGrass.rotation.y=rand()*6.28;dummyGrass.scale.setScalar(.6+rand()*1.6);dummyGrass.updateMatrix();grass.setMatrixAt(i,dummyGrass.matrix);}grass.instanceMatrix.needsUpdate=true;scene.add(grass);
+ const grassGeo=tuftGeometry();
+ const grass=new T.InstancedMesh(grassGeo,new T.MeshToonMaterial({color:0xffffff,map:tuftTexture(),alphaTest:.5,gradientMap:gradient,side:T.DoubleSide}),1100),dummyGrass=new T.Object3D();
+ for(let i=0;i<1100;i++){let x=(rand()-.5)*95,z=(rand()-.5)*125;if(Math.abs(x)<5&&z>-17)x+=7;if(Math.hypot(x,z+32)<11.8)x+=(x<0?-1:1)*13;dummyGrass.position.set(x,.14,z);dummyGrass.rotation.y=rand()*6.28;dummyGrass.scale.setScalar(.7+rand()*.9);dummyGrass.updateMatrix();grass.setMatrixAt(i,dummyGrass.matrix);}grass.instanceMatrix.needsUpdate=true;scene.add(grass);
  const ferns=new T.InstancedMesh(leaf(),new T.MeshToonMaterial({color:0x4aa24a,gradientMap:gradient,side:T.DoubleSide}),120);
  for(let i=0;i<120;i++){const side=i%2?-1:1,x=side*(18+rand()*26),z=45-rand()*105;dummyGrass.position.set(x,.1,z);dummyGrass.rotation.set(.25+rand()*.5,rand()*6.28,(rand()-.5)*.2);dummyGrass.scale.setScalar(.3+rand()*.45);dummyGrass.updateMatrix();ferns.setMatrixAt(i,dummyGrass.matrix);}scene.add(ferns);
  // Large buttress-root trees, dense layered canopy and trailing lianas.

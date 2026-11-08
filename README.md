@@ -21,6 +21,19 @@ Open the existing private play URL and choose **PLAY — ISLAND CLASH**. Click t
 
 Start with **Tab → E → K → J**: acquire the rival, close the gap, launch, then follow up in the air. Use **F** when hit to escape. The ultimate begins half-charged in training; build it through combat, then press **5**. Light input can queue once near the end of recovery. Use **2** for Manman Dlo healing. Guard faces forward, and a well-timed guard can parry. Two escape charges regenerate individually.
 
+## Playable heroes (concept-sheet pass)
+
+Four original fighters built from the project's concept sheets in `dist/art/heroes.js`. Each is sculpted from smooth curved geometry with painted cloth, an anime face and ink outlines, and runs on the shared skeleton, so every combat pose still works.
+
+| Hero | Look |
+| --- | --- |
+| **Toussaint** · Gadyen Fò | Steel pauldrons and plates, black long coat with crimson trim, rope belt and tabard, locs in a top bun, goatee |
+| **Léo Zéklè** · Storm runner | Cropped black/yellow jacket with lightning bolts, cargo pants, patterned hip wrap, banded locs, grin |
+| **Ansèlm** · Kenbwazè | Purple spirit-flame robe with wide sleeves, bead necklace, talismans, long mane over one eye |
+| **Yana** · Fi Manman Dlo | White scale top, blue obi, gold rope, teal sea-dragon cape, golden horns and long wavy hair |
+
+Pick a fighter and a rival on the title screen; **C** switches fighter mid-session. The ground is now painted (brushed grass, organic dirt patches with dark rims, grass-tuft cards) and the arena walls are panelled concrete.
+
 ## Anime arena look (reference-clip pass)
 
 The presentation now follows the look of the supplied gameplay clips — bright cel-shaded arena brawler — while staying original and Caribbean. See [Docs/ANIME_LOOK.md](Docs/ANIME_LOOK.md).
@@ -43,7 +56,7 @@ See [video milestone details, file inventory and remaining work](Docs/VIDEO_MILE
 
 ## Verification
 
-`node tests/gameplay.cjs` passes **49 gameplay simulations** using real Three.js geometry/transforms/math with mocked DOM/WebGL. All application JavaScript files pass `node --check`. These checks do not establish rendered appearance or hardware compatibility. CPU pose projections help inspect geometry but omit textures and WebGL shading. Managed browser control is unavailable, so browser rendering, physical controllers, touch input, audio playback and actual frame rate remain unverified.
+`node tests/gameplay.cjs` passes **51 gameplay simulations** using real Three.js geometry/transforms/math with mocked DOM/WebGL. All application JavaScript files pass `node --check`. These checks do not establish rendered appearance or hardware compatibility. CPU pose projections help inspect geometry but omit textures and WebGL shading. Managed browser control is unavailable, so browser rendering, physical controllers, touch input, audio playback and actual frame rate remain unverified.
 
 The game's character assets and animation are procedural. It is not yet at the supplied commercial clip's character/animation fidelity. There is one AI rival, no online team multiplayer, campaign, full character editor, authored production animations or packaged UE build. The AI may still get blocked on complex rooftop routes. Next priorities are actual browser/device capture and tuning, authored original characters/animations, and a compiled UE integration.
 

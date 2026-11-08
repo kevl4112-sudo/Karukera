@@ -19,7 +19,7 @@ global.KarukeraPost=function(renderer,scene,camera){
  geometry.setAttribute('position',new T.Float32BufferAttribute([-1,-1,0,3,-1,0,-1,3,0],3));geometry.setAttribute('uv',new T.Float32BufferAttribute([0,0,2,0,0,2],2));
  const quad=new T.Mesh(geometry),quadScene=new T.Scene();quad.frustumCulled=false;quadScene.add(quad);
  const vertexShader='varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}';
- const bright=new T.ShaderMaterial({uniforms:{tColor:{value:null},threshold:{value:targets.hdr?1.0:.82}},vertexShader,depthTest:false,depthWrite:false,
+ const bright=new T.ShaderMaterial({uniforms:{tColor:{value:null},threshold:{value:targets.hdr?1.45:.9}},vertexShader,depthTest:false,depthWrite:false,
   fragmentShader:'uniform sampler2D tColor;uniform float threshold;varying vec2 vUv;void main(){vec3 c=texture2D(tColor,vUv).rgb;float l=max(c.r,max(c.g,c.b));float k=smoothstep(threshold*.72,threshold*1.25,l);gl_FragColor=vec4(c*k,1.);}'});
  const blur=new T.ShaderMaterial({uniforms:{tColor:{value:null},direction:{value:new T.Vector2()}},vertexShader,depthTest:false,depthWrite:false,
   fragmentShader:'uniform sampler2D tColor;uniform vec2 direction;varying vec2 vUv;void main(){vec3 s=texture2D(tColor,vUv).rgb*.227;s+=(texture2D(tColor,vUv+direction*1.384).rgb+texture2D(tColor,vUv-direction*1.384).rgb)*.316;s+=(texture2D(tColor,vUv+direction*3.23).rgb+texture2D(tColor,vUv-direction*3.23).rgb)*.07;gl_FragColor=vec4(s,1.);}'});
